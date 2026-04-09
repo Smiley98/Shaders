@@ -41,7 +41,9 @@ Shader "Hidden/FullscreenShader"
             
             float4 frag (v2f i) : SV_Target
             {
-                float4 col = float4(i.uv.x, 0.0, 0.0, 1.0);
+                i.uv.x *= _ScreenParams.x / _ScreenParams.y;
+
+                float4 col = float4(i.uv, 0.0, 1.0);
                 return col;
             }
             ENDCG
