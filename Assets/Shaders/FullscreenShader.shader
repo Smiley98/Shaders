@@ -1,9 +1,5 @@
 Shader "Hidden/FullscreenShader"
 {
-    Properties
-    {
-        _MainTex ("Texture", 2D) = "white" {}
-    }
     SubShader
     {
         // No culling or depth
@@ -37,11 +33,14 @@ Shader "Hidden/FullscreenShader"
                 return o;
             }
 
-            sampler2D _MainTex;
+
 
             fixed4 frag (v2f i) : SV_Target
             {
-                fixed4 col = fixed4(1.0, 0.0, 1.0, 1.0);
+                float t = _Time.y;
+                float ncos = cos(t) * 0.5 + 0.5;
+
+                fixed4 col = fixed4(i.uv, ncos, 1.0);
                 return col;
             }
             ENDCG
