@@ -38,10 +38,10 @@ Shader "Hidden/FullscreenShader"
             }
 
             sampler2D _MainTex;
-
+            
             float4 frag (v2f i) : SV_Target
             {
-                float4 col = float4(1.0, 0.0, 0.0, 1.0);
+                float4 col = float4(i.uv.x, 0.0, 0.0, 1.0);
                 return col;
             }
             ENDCG
