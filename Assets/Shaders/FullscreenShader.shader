@@ -33,16 +33,76 @@ Shader "Hidden/FullscreenShader"
                 return o;
             }
 
+            float sdSphere( float3 p, float r )
+            {
+                return length(p) - r;
+            }
 
+            float sdBox( float3 p, float3 b )
+            {
+                float3 q = abs(p) - b;
+                return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+            }
+
+            float map(float3 p)
+            {
+                float t = sin(_Time.y) * 0.5 + 0.5;
+                float3 pSphere = p - float3(-2.0, 0.0, 2.0);
+                float3 pBox = p - float3( 2.0, 0.0, 2.0);
+                
+                //float3 pSphere = p - mix(float3(0.0, 0.0, 1.0), float3(0.0, 0.0, 5.0), t);
+                float dSphere = sdSphere(pSphere, 1.0);
+                float dBox = sdBox(pBox, float3(1.0, 1.0, 1.0));
+                
+                return min(dSphere, dBox);
+            }
+
+            //fixed4 frag (v2f i) : SV_Target
+            //{
+            //    float t = _Time.y;
+            //    float ncos = cos(t) * 0.5 + 0.5;
+            //
+            //    fixed4 col = fixed4(i.uv, ncos, 1.0);
+            //    return col;
+            //}
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float t = _Time.y;
-                float ncos = cos(t) * 0.5 + 0.5;
-
-                fixed4 col = fixed4(i.uv, ncos, 1.0);
+                //vec2 uv = fragCoord / iResolution.xy;
+                //uv = uv * 2.0 - 1.0;
+                //uv.x *= iResolution.x / iResolution.y;
+                float2 uv = i.uv * 2.0 - 1.0;
+                
+                float3 ro = float3(0.0, 0.0, -1.0);            // ray origin (camera position)
+                float3 rd = normalize(float3(uv.x, uv.y, 1.0));// ray direction (camera direction)
+                
+                float3 p = ro;   // position along ray
+                float t = 0.0; // distance along ray
+                
+                float far = 5.0;
+                
+                for (int i = 0; i < 64; i++)
+                {
+                    float d = map(p); // 1) Compute safe distance
+                    t += d;           // 2) Accumulate distance along ray
+                    p = ro + rd * t;  // 3) Calculate position along ray
+                    
+                    if (d <= 0.01)
+                    {
+                        break;
+                    }
+                    
+                    if (t >= far)
+                    {
+                        break;
+                    }
+                }
+                
+                float3 rgb = float3(1.0, 1.0, 1.0) * (t / far);
+                fixed4 col = fixed4(rgb, 1.0);
                 return col;
             }
+
             ENDCG
         }
     }
