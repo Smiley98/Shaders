@@ -33,6 +33,11 @@ Shader "Hidden/FullscreenShader"
                 return o;
             }
 
+            float sdCircle( float2 p, float r )
+            {
+                return length(p) - r;
+            }
+
             float sdSphere( float3 p, float r )
             {
                 return length(p) - r;
@@ -50,31 +55,22 @@ Shader "Hidden/FullscreenShader"
                 float3 pSphere = p - float3(-2.0, 0.0, 2.0);
                 float3 pBox = p - float3( 2.0, 0.0, 2.0);
                 
-                //float3 pSphere = p - mix(float3(0.0, 0.0, 1.0), float3(0.0, 0.0, 5.0), t);
                 float dSphere = sdSphere(pSphere, 1.0);
                 float dBox = sdBox(pBox, float3(1.0, 1.0, 1.0));
                 
                 return min(dSphere, dBox);
             }
 
-            //fixed4 frag (v2f i) : SV_Target
-            //{
-            //    float t = _Time.y;
-            //    float ncos = cos(t) * 0.5 + 0.5;
-            //
-            //    fixed4 col = fixed4(i.uv, ncos, 1.0);
-            //    return col;
-            //}
-
             fixed4 frag (v2f i) : SV_Target
             {
-                //vec2 uv = fragCoord / iResolution.xy;
-                //uv = uv * 2.0 - 1.0;
-                //uv.x *= iResolution.x / iResolution.y;
                 float2 uv = i.uv * 2.0 - 1.0;
+                uv.x *= _ScreenParams.x / _ScreenParams.y;
                 
-                float3 ro = float3(0.0, 0.0, -1.0);            // ray origin (camera position)
-                float3 rd = normalize(float3(uv.x, uv.y, 1.0));// ray direction (camera direction)
+                // Extra practice: find a way to apply Unity's camera rotation to our ray direction!
+                float3x3 cam = (float3x3)UNITY_MATRIX_V;
+                float3 ro = _WorldSpaceCameraPos;
+                float3 rd = normalize(float3(uv.x, uv.y, 1.0));
+                rd = mul(cam, rd);
                 
                 float3 p = ro;   // position along ray
                 float t = 0.0; // distance along ray

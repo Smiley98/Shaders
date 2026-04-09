@@ -2,21 +2,10 @@ using UnityEngine;
 
 public class ShaderScript : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public Material material;
 
-    void OnRenderImage(RenderTexture src, RenderTexture dest) {
+    void OnRenderImage(RenderTexture src, RenderTexture dest)
+    {
         Graphics.Blit(src, dest, material);
     }
 }
