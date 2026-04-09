@@ -62,8 +62,11 @@ Shader "Hidden/FullscreenShader"
                 uv = uv * 2.0 - 1.0;
                 uv.x *= _ScreenParams.x / _ScreenParams.y;
                 
-                float3 ro = float3(0.0, 0.0, -1.0);            // ray origin (camera position)
-                float3 rd = normalize(float3(uv.x, uv.y, 1.0));// ray direction (camera direction)
+                float3 ro = _WorldSpaceCameraPos;               // ray origin (camera position)
+                float3 rd = normalize(float3(uv.x, uv.y, 1.0)); // ray direction (camera direction)
+
+                // TODO -- Figure out how to appy camera rotation to ray direction
+                rd = mul((float3x3)UNITY_MATRIX_V, rd);
                 
                 float3 p = ro;   // position along ray
                 float t = 0.0; // distance along ray
